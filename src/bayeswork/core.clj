@@ -28,6 +28,18 @@
         the-indices (map (fn [s] (length (take-while #(> s %) intervals))) unif-samples)]
     (map #(nth samples %) the-indices)))
 
+(defn sim-sample-z 
+  "computes a single sample z based on a prior beta and actual data z, n"
+  [a b z n]
+  (let [post-a (+ a z)
+        post-b (- (+ b n) z)
+        sample-theta (sample-beta 1 :alpha post-a :beta post-b)
+        sample-data (samples-with-prob [0 1] n [(- 1.0 sample-theta) sample-theta])]
+    (sum sample-data)))
+
+(defn beta-posterior-predictions [a b z n]
+  (repeatedly 10000 #(sim-sample-z a b z n)))
+
 (defn plot-p-data-given-theta 
   "plots the likelihood of the data for a range of thetas"
   [n z]

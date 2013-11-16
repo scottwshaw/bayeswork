@@ -68,6 +68,9 @@
 (pdata 100 1 8 12)
 ;; Bayes factor
 (/ (pdata 100 1 8 12) (pdata 1 100 8 12))
+;; Predicting the posterior
+(view (histogram (beta-posterior-predictions 100 1 8 12)))
+  
 
 (sum (samples-with-prob [0 1] 100000 [2 8]))
 
