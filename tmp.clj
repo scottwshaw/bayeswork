@@ -22,6 +22,20 @@
 
 (def somearray [[1/2 2 3] [4 5 6]])
 
+(def v [1 2 3 4])
+
+(sqrt (mmult (trans v) v))
+(sqrt (sum-of-squares v))
+(div v (sum v))
+(rest (reductions + 0 (div v (sum v))))
+(def ivals (rest (reductions + 0 (div v (sum v)))))
+(print ivals)
+(let [testval (rand)] (length (take-while #(> testval %) ivals)))
+
+(repeatedly 5 rand)
+
+(reductions + 0 v)
+
 (* 2 somearray)
 
 (- 2 1)
@@ -46,6 +60,16 @@
 (pdata 100 1 1 1)
 ;; Bayes factor
 (/ (pdata 100 1 1 1) (pdata 1 100 1 1))
+
+;; Exercise 5.8
+;; evidence that 8 / 12 flips is a tails coin
+(pdata 1 100 8 12)
+;; evidence that 8/12 flips is a heads coin
+(pdata 100 1 8 12)
+;; Bayes factor
+(/ (pdata 100 1 8 12) (pdata 1 100 8 12))
+
+(sum (samples-with-prob [0 1] 100000 [2 8]))
 
 (pow (range 0 10 0.1) 2.0)
 

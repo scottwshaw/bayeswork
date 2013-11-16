@@ -20,6 +20,14 @@
     (/ (beta (+ z a) (+ (- n z) b))
        (beta a b))))
 
+(defn samples-with-prob 
+  "takes size samples with weights from prob, like the R func sample with replace=TRUE" 
+  [samples size prob]
+  (let [intervals (rest (reductions + 0 (div prob (sum prob))))
+        unif-samples (repeatedly size rand)
+        the-indices (map (fn [s] (length (take-while #(> s %) intervals))) unif-samples)]
+    (map #(nth samples %) the-indices)))
+
 (defn plot-p-data-given-theta 
   "plots the likelihood of the data for a range of thetas"
   [n z]
