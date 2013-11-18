@@ -1,7 +1,5 @@
 (ns bayeswork.core
   (:refer-clojure :exclude [* / - + == ])
-  ;; (:require [clojure.core.matrix :as ccm])
-  ;; (:require [clojure.core.matrix.operators :as ccmo])
   (:use incanter.core)
   (:use incanter.stats)
   (:use incanter.charts))
