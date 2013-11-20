@@ -70,7 +70,28 @@
 (/ (pdata 100 1 8 12) (pdata 1 100 8 12))
 ;; Predicting the posterior
 (view (histogram (beta-posterior-predictions 100 1 8 12)))
+;; Exercise 6.1
+(view 
+ (let [n-intervals 10
+       width (/ 1 n-intervals)
+       theta (range (/ width 2) (- 1 (/ width 2)) width)
+       approx-mass (mult (pdf-beta theta :alpha 8 :beta 4) width)
+       p-theta (div approx-mass (sum approx-mass))]
+   (bar-chart theta p-theta)))
+;; Exercise 6.2
+(view 
+ (let [shape-theta (concat (range 50 1) (range 1 50) (range 50 1) (range 1 50))
+       p-theta (div shape-theta (sum shape-theta))
+       width (/ 1 (length p-theta))
+       theta (range (/ 2 width) (- 1 (/ 2 width)) width)]
+   (bar-chart theta p-theta)))
+
+(doc reductions)
+
+(num-seq 0.1 -1 -0.1)
   
+
+(print (map #(- 51 %) (range 1 51)))
 
 (sum (samples-with-prob [0 1] 100000 [2 8]))
 
@@ -79,6 +100,8 @@
 (minus (range 0.01 1 0.01) 1)
  
 (ccmo/-  1)
+
+(Math/round (/ 12 13))
 
 
 

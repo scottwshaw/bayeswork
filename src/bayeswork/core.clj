@@ -1,8 +1,8 @@
 (ns bayeswork.core
-  (:refer-clojure :exclude [* / - + == ])
   (:use incanter.core)
   (:use incanter.stats)
-  (:use incanter.charts))
+  (:use incanter.charts)
+  (:require [clojure.math.numeric-tower :as math]))
 
 (defn plot-ptheta 
   "Plots dbeta priors"
@@ -44,3 +44,38 @@
   (let [theta (range 0.01 1 0.01)
         p-data-given-theta (map * (pow theta z) (pow (minus 1 theta) (- n z)))]
     (xy-plot theta p-data-given-theta)))
+
+(defn not-yet-reached [item last incr]
+  (cond
+   (> incr 0) (<= item last)
+   (< incr 0) (>= item last)
+   :else false))
+
+(defn num-seq [start last & [incr]]
+  (let [incr (cond (> start last) (or incr -1)
+                   :else 1)]
+    (take-while #(not-yet-reached % last incr) 
+                ((fn nseq [ith]
+                   (lazy-seq (cons ith (nseq (+ ith incr)))))
+                 start))))
+
+(defn thin-index [nteeth n-to-plot]
+  (cond 
+   (> nteeth n-to-plot) (let [r (range 1 nteeth (math/round (/ nteeth n-to-plot)))]
+                          (cond 
+                           (< (length r) nteeth) (concat r [nteeth])
+                           :else r))
+   :else (range 1 nteeth)))
+
+(defn bern-grid
+  "Chapter 6 function that plots discrete beta stuff"
+  [theta p-theta data n-to-plot]
+  (let [z (count (filter #(== 1 %) data))
+        n (length data)
+        p-data-given-theta (map * (pow theta z) (pow (minus 1 theta) (- n z)))
+        p-data (sum (mult p-theta p-data-given-theta))
+        thindx (thin-index (length theta) n-to-plot)]
+    (bar-chart thindx p-theta)))
+
+    
+        
