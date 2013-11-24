@@ -74,9 +74,12 @@
   [theta p-theta data n-to-plot]
   (let [z (count (filter #(== 1 %) data))
         n (length data)
-        p-data-given-theta (map * (pow theta z) (pow (minus 1 theta) (- n z)))
+        p-data-given-theta (map * (pow theta z) (pow (minus 1 theta) (- n z))) ;likelihood
         p-data (sum (mult p-theta p-data-given-theta))
+        p-theta-given-data (div (mult p-data-given-theta p-theta) p-data)
         thindx (thin-index (length theta) n-to-plot)
         thinned-theta (map #(nth theta %) thindx)
-        thinned-p-theta (map #(nth p-theta %) thindx)]
-    (bar-chart thinned-theta thinned-p-theta)))
+        thinned-p-theta (map #(nth p-theta %) thindx)
+        thinned-p-data-given-theta (map #(nth p-data-given-theta %) thindx)
+        thinned-p-theta-given-data (map #(nth p-theta-given-data %) thindx)]
+    [thinned-theta thinned-p-theta thinned-p-data-given-theta thinned-p-theta-given-data]))
