@@ -2,7 +2,8 @@ pom.xml
 *jar
 /lib/
 /classes/
-/targets/
+/target/
+.nrepl*
 .lein-deps-sum
 .lein-repl-history
 *~

@@ -53,19 +53,21 @@
 
 (defn num-seq [start last & [incr]]
   (let [incr (cond (> start last) (or incr -1)
-                   :else 1)]
+                   :else (or incr 1))]
     (take-while #(not-yet-reached % last incr) 
                 ((fn nseq [ith]
                    (lazy-seq (cons ith (nseq (+ ith incr)))))
                  start))))
 
 (defn thin-index [nteeth n-to-plot]
-  (cond 
-   (> nteeth n-to-plot) (let [r (range 1 nteeth (math/round (/ nteeth n-to-plot)))]
-                          (cond 
-                           (< (length r) nteeth) (concat r [nteeth])
-                           :else r))
-   :else (range 1 nteeth)))
+  (cond
+   (> nteeth n-to-plot) (let [incr (math/round (/ nteeth n-to-plot))
+                              thindx (num-seq 0 (- nteeth incr) incr)]
+                          (println (length thindx) nteeth)
+                          (cond
+                           (< (length thindx) nteeth) (concat thindx [(dec nteeth)])
+                           :else thindx))
+   :else (num-seq 0 (dec nteeth))))
 
 (defn bern-grid
   "Chapter 6 function that plots discrete beta stuff"
@@ -74,8 +76,7 @@
         n (length data)
         p-data-given-theta (map * (pow theta z) (pow (minus 1 theta) (- n z)))
         p-data (sum (mult p-theta p-data-given-theta))
-        thindx (thin-index (length theta) n-to-plot)]
-    (bar-chart thindx p-theta)))
-
-    
-        
+        thindx (thin-index (length theta) n-to-plot)
+        thinned-theta (map #(nth theta %) thindx)
+        thinned-p-theta (map #(nth p-theta %) thindx)]
+    (bar-chart thinned-theta thinned-p-theta)))
