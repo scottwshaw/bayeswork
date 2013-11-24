@@ -95,23 +95,14 @@
        theta (num-seq (/ width 2) (- 1 (/ width 2)) width)
        data [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0]
        n-to-plot 99
-       charts (bern-grid theta p-theta data n-to-plot)]
+       [?theta ?prior ?liklihd ?post] (bern-grid theta p-theta data n-to-plot)]
    (view (bar-chart theta p-theta))
-   (view (nth charts 0))
-   (view (nth charts 1))
-   (view (nth charts 2)))
+   (view (bar-chart ?theta ?prior))
+   (view (bar-chart ?theta ?liklihd))
+   (view (bar-chart ?theta ?post)))
 
 
 ;; Exercise 6.3a
-(defn b-grid
-  "Chapter 6 function that plots discrete beta stuff"
-  [theta p-theta data n-to-plot]
-  (let [z (count (filter #(== 1 %) data))
-        n (length data)
-        p-data-given-theta (map * (pow theta z) (pow (minus 1 theta) (- n z)))
-        p-data (sum (mult p-theta p-data-given-theta))]
-    (print z n (length p-data-given-theta) (length p-data))))
-
  (let [shape-theta (concat (num-seq 50 1) (repeat 50 1) (num-seq 1 50) 
                            (num-seq 50 1) (repeat 50 1) (num-seq 1 50))
        p-theta (div shape-theta (sum shape-theta))
@@ -124,6 +115,22 @@
    (view (bar-chart ?theta ?prior))
    (view (bar-chart ?theta ?likihd))
    (view (bar-chart ?theta ?post)))
+
+;; Exercise 6.3b
+ (let [shape-theta (concat (num-seq 50 1) (repeat 50 1) (num-seq 1 50) 
+                           (num-seq 50 1) (repeat 50 1) (num-seq 1 50))
+       p-theta (div shape-theta (sum shape-theta))
+       width (/ 1 (length p-theta))
+       theta (num-seq (/ width 2) (- 1 (/ width 2)) width)
+       data [1 1 1 0]
+       [?theta1 ?prior1 ?likihd1 ?post1] (bern-grid theta p-theta data 99)
+       addl-data [1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0]
+       [?theta ?prior ?likihd ?post] (bern-grid ?theta1 ?post1 addl-data 101)]
+   (view (bar-chart ?theta1 ?post1))
+   (view (bar-chart ?theta ?prior))
+   (view (bar-chart ?theta ?likihd))
+   (view (bar-chart ?theta ?post)))
+
 
 (def a [1 2 3 4])
 (map (partial nth a) [0 1 3])
