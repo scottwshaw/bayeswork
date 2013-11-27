@@ -95,12 +95,14 @@
        theta (num-seq (/ width 2) (- 1 (/ width 2)) width)
        data [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0]
        n-to-plot 99
-       [?theta ?prior ?liklihd ?post] (bern-grid theta p-theta data n-to-plot)]
+       [?theta ?prior ?liklihd ?post] (bern-grid theta p-theta data n-to-plot)
+       hdi (hdi-of-grid ?post (/ 0.95 3))
+       hdi-line [[(nth ?theta (apply min (:indices hdi))) (:height hdi)] 
+                 [(nth ?theta (apply max (:indices hdi))) (:height hdi)]]]
    (view (bar-chart theta p-theta))
    (view (bar-chart ?theta ?prior))
    (view (bar-chart ?theta ?liklihd))
-   (view (bar-chart ?theta ?post)))
-
+   (view (add-polygon (xy-plot ?theta ?post) hdi-line)))
 
 ;; Exercise 6.3a
  (let [shape-theta (concat (num-seq 50 1) (repeat 50 1) (num-seq 1 50) 
@@ -110,11 +112,14 @@
        theta (num-seq (/ width 2) (- 1 (/ width 2)) width)
        data [1 1 1 0]
        n-to-plot 99
-       [?theta ?prior ?likihd ?post] (bern-grid theta p-theta data n-to-plot)]
+       [?theta ?prior ?likihd ?post] (bern-grid theta p-theta data n-to-plot)
+       hdi (hdi-of-grid ?post (/ 0.95 3))
+       hdi-line [[(nth ?theta (apply min (:indices hdi))) (:height hdi)] 
+                 [(nth ?theta (apply max (:indices hdi))) (:height hdi)]]]
    (view (bar-chart theta p-theta))
    (view (bar-chart ?theta ?prior))
    (view (bar-chart ?theta ?likihd))
-   (view (bar-chart ?theta ?post)))
+   (view (add-polygon (xy-plot ?theta ?post) hdi-line)))
 
 ;; Exercise 6.3b
  (let [shape-theta (concat (num-seq 50 1) (repeat 50 1) (num-seq 1 50) 
@@ -125,21 +130,63 @@
        data [1 1 1 0]
        [?theta1 ?prior1 ?likihd1 ?post1] (bern-grid theta p-theta data 99)
        addl-data [1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0]
-       [?theta ?prior ?likihd ?post] (bern-grid ?theta1 ?post1 addl-data 101)]
+       [?theta ?prior ?likihd ?post] (bern-grid ?theta1 ?post1 addl-data 101)
+       hdi (hdi-of-grid ?post)          ;no need to divide by 3 here take default 0.95
+       hdi-line [[(nth ?theta (apply min (:indices hdi))) (:height hdi)] 
+                 [(nth ?theta (apply max (:indices hdi))) (:height hdi)]]]
    (view (bar-chart ?theta1 ?post1))
    (view (bar-chart ?theta ?prior))
    (view (bar-chart ?theta ?likihd))
-   (view (bar-chart ?theta ?post)))
+   (view (add-polygon (xy-plot ?theta ?post) hdi-line)))
 
+;; Exercise 6.4a
+(let [p-theta (repeat 256 1/256)
+      width (/ 1 (length p-theta))
+      theta (num-seq (/ width 2) (- 1 (/ width 2)) width)
+      data (concat (repeat 58 1) (repeat 42 0))
+      n-to-plot 100
+      [?theta ?prior ?likihd ?post] (bern-grid theta p-theta data n-to-plot)
+      hdi (hdi-of-grid ?post (/ 0.95 2.56))
+      hdi-line [[(nth ?theta (apply min (:indices hdi))) (:height hdi)] 
+                [(nth ?theta (apply max (:indices hdi))) (:height hdi)]]]
+  (view (add-polygon (xy-plot ?theta ?post) hdi-line)))
 
-(def a [1 2 3 4])
-(map (partial nth a) [0 1 3])
-(print (vals (select-keys a [0 1 3])))
+;; Exercise 6.4c
+ (let [p-theta (repeat 256 1/256)
+       width (/ 1 (length p-theta))
+       theta (num-seq (/ width 2) (- 1 (/ width 2)) width)
+       data (concat (repeat 58 1) (repeat 42 0))
+       [?theta1 ?prior1 ?likihd1 ?post1] (bern-grid theta p-theta data 99)
+       addl-data (concat (repeat 57 1) (repeat 43 0))
+       n-to-plot 256
+       [?theta ?prior ?likihd ?post] (bern-grid theta p-theta data n-to-plot)
+       [?theta ?prior ?likihd ?post] (bern-grid ?theta1 ?post1 addl-data 101)
+       hdi (hdi-of-grid ?post)
+       hdi-line [[(nth ?theta (apply min (:indices hdi))) (:height hdi)] 
+                 [(nth ?theta (apply max (:indices hdi))) (:height hdi)]]]
+   (view (add-polygon (xy-plot ?theta ?post) hdi-line)))
 
+;; Exercise 6.5
+(let [p-theta (repeat 256 1/256)
+      width (/ 1 (length p-theta))
+      theta (num-seq (/ width 2) (- 1 (/ width 2)) width)
+      data (concat (repeat 58 1) (repeat 42 0))
+      n-to-plot 99
+      [?theta ?prior ?likihd ?post] (bern-grid theta p-theta data n-to-plot)
+      hdi (hdi-of-grid ?post (/ 0.95 3))
+      hdi-line [[(nth ?theta (apply min (:indices hdi))) (:height hdi)] 
+                [(nth ?theta (apply max (:indices hdi))) (:height hdi)]]]
+  (println ?likihd)
+  (view (add-polygon (xy-plot ?theta ?post) hdi-line)))
 
-(doc reductions)
 
 (use 'bayeswork.core :reload-all)
+
+(apply max (keep-indexed (fn [i e] (cond (<= e 9) i :else nil)) [4 7 9 10]))
+
+
+(reductions + (sort > [1 2 3 4]))
+
 (require '[clojure.math.numeric-tower :as math])
 
 (math/round (/ 300 99))

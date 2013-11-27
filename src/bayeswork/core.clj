@@ -63,7 +63,6 @@
   (cond
    (> nteeth n-to-plot) (let [incr (math/round (/ nteeth n-to-plot))
                               thindx (num-seq 0 (- nteeth incr) incr)]
-                          (println (length thindx) nteeth)
                           (cond
                            (< (length thindx) nteeth) (concat thindx [(dec nteeth)])
                            :else thindx))
@@ -83,3 +82,17 @@
         thinned-p-data-given-theta (map #(nth p-data-given-theta %) thindx)
         thinned-p-theta-given-data (map #(nth p-theta-given-data %) thindx)]
     [thinned-theta thinned-p-theta thinned-p-data-given-theta thinned-p-theta-given-data]))
+
+(defn hdi-of-grid 
+  "from section 23.3 of the book.  returns a map of indices, the mass, and the hdi height"
+  [p-mass-vec & [cred-mass]]
+  (let [cred-mass (or cred-mass 0.95) 
+        sorted-mass (sort > p-mass-vec)
+        cum-sums (reductions + sorted-mass)
+        ;; hdi-height-index (apply max (for [i (range 0 (dec (length cum-sums))) 
+        ;;                                   :while (<= (nth cum-sums i) cred-mass)] i))
+        hdi-height-index (apply max (keep-indexed (fn [i e] (cond (<= e cred-mass) i :else nil)) cum-sums))
+        hdi-height (nth sorted-mass hdi-height-index)
+        hdi-mass (sum (filter #(>= % hdi-height) p-mass-vec))
+        indices (keep-indexed (fn [ind elem] (cond (>= elem hdi-height) ind :else nil)) p-mass-vec)]
+    {:indices indices :mass hdi-mass :height hdi-height}))
